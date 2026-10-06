@@ -1,0 +1,17 @@
+Command: .\.venv\Scripts\python.exe -m pytest tests/test_03_runner.py -vv
+
+============================= test session starts =============================
+platform win32 -- Python 3.12.5, pytest-9.1.1, pluggy-1.6.0 -- D:\AI\Day20\.venv\Scripts\python.exe
+rootdir: D:\AI\Day20
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.14.4
+collecting ... collected 6 items
+
+tests/test_03_runner.py::test_three_conditions_defined PASSED            [ 16%]
+tests/test_03_runner.py::test_run_task_saves_a_complete_record PASSED    [ 33%]
+tests/test_03_runner.py::test_task_workspace_in_repo_is_never_modified PASSED [ 50%]
+tests/test_03_runner.py::test_errors_are_recorded_not_raised PASSED      [ 66%]
+tests/test_03_runner.py::test_modifying_skills_is_flagged PASSED         [ 83%]
+tests/test_03_runner.py::test_skill_reads_and_subagent_calls_are_counted PASSED [100%]
+
+============================== 6 passed in 5.18s ==============================

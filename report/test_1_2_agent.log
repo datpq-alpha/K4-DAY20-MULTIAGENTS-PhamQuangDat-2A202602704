@@ -1,0 +1,20 @@
+Command: .\.venv\Scripts\python.exe -m pytest tests/test_02_agent.py -vv
+
+============================= test session starts =============================
+platform win32 -- Python 3.12.5, pytest-9.1.1, pluggy-1.6.0 -- D:\AI\Day20\.venv\Scripts\python.exe
+rootdir: D:\AI\Day20
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.14.4
+collecting ... collected 9 items
+
+tests/test_02_agent.py::test_backend_finds_python_and_hides_secrets PASSED [ 11%]
+tests/test_02_agent.py::test_file_tools_and_shell_share_relative_paths PASSED [ 22%]
+tests/test_02_agent.py::test_agent_has_file_shell_and_task_tools PASSED  [ 33%]
+tests/test_02_agent.py::test_agent_uses_the_provided_base_prompt PASSED  [ 44%]
+tests/test_02_agent.py::test_subagents_have_required_fields PASSED       [ 55%]
+tests/test_02_agent.py::test_subagents_mode_adds_subagents_and_delegation_note PASSED [ 66%]
+tests/test_02_agent.py::test_skills_are_loaded_only_when_requested PASSED [ 77%]
+tests/test_02_agent.py::test_unknown_mode_is_rejected PASSED             [ 88%]
+tests/test_02_agent.py::test_subagents_receive_the_path_convention PASSED [100%]
+
+============================== 9 passed in 4.79s ==============================

@@ -1,0 +1,40 @@
+Command: docker exec peaceful_bose sh -lc 'cd /lab && python -m pytest tests/test_01_provided.py tests/test_02_agent.py tests/test_03_runner.py tests/test_04_curator.py -vv'
+
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python
+rootdir: /lab
+configfile: pyproject.toml
+plugins: langsmith-0.14.4, anyio-4.15.1
+collecting ... collected 29 items
+
+tests/test_01_provided.py::test_six_tasks_three_families PASSED          [  3%]
+tests/test_01_provided.py::test_untouched_workspace_does_not_score_full PASSED [  6%]
+tests/test_01_provided.py::test_feedback_only_on_failed_checks_of_learning_tasks PASSED [ 10%]
+tests/test_01_provided.py::test_instructions_use_relative_paths PASSED   [ 13%]
+tests/test_01_provided.py::test_hash_dir_detects_changes PASSED          [ 17%]
+tests/test_01_provided.py::test_eval_markers_are_computed_from_the_eval_tasks PASSED [ 20%]
+tests/test_01_provided.py::test_render_trace_hides_home_directory_and_shows_calls PASSED [ 24%]
+tests/test_01_provided.py::test_compare_table_columns_cells_and_means PASSED [ 27%]
+tests/test_01_provided.py::test_hash_skills_matches_the_hash_of_a_sandbox PASSED [ 31%]
+tests/test_01_provided.py::test_validate_skill_accepts_good_and_rejects_bad PASSED [ 34%]
+tests/test_01_provided.py::test_parse_skill_blocks_survives_missing_end_markers PASSED [ 37%]
+tests/test_01_provided.py::test_compare_ignores_renamed_backup_folders PASSED [ 41%]
+tests/test_02_agent.py::test_backend_finds_python_and_hides_secrets PASSED [ 44%]
+tests/test_02_agent.py::test_file_tools_and_shell_share_relative_paths PASSED [ 48%]
+tests/test_02_agent.py::test_agent_has_file_shell_and_task_tools PASSED  [ 51%]
+tests/test_02_agent.py::test_agent_uses_the_provided_base_prompt PASSED  [ 55%]
+tests/test_02_agent.py::test_subagents_have_required_fields PASSED       [ 58%]
+tests/test_02_agent.py::test_subagents_mode_adds_subagents_and_delegation_note PASSED [ 62%]
+tests/test_02_agent.py::test_skills_are_loaded_only_when_requested PASSED [ 65%]
+tests/test_02_agent.py::test_unknown_mode_is_rejected PASSED             [ 68%]
+tests/test_02_agent.py::test_subagents_receive_the_path_convention PASSED [ 72%]
+tests/test_03_runner.py::test_three_conditions_defined PASSED            [ 75%]
+tests/test_03_runner.py::test_run_task_saves_a_complete_record PASSED    [ 79%]
+tests/test_03_runner.py::test_task_workspace_in_repo_is_never_modified PASSED [ 82%]
+tests/test_03_runner.py::test_errors_are_recorded_not_raised PASSED      [ 86%]
+tests/test_03_runner.py::test_modifying_skills_is_flagged PASSED         [ 89%]
+tests/test_03_runner.py::test_skill_reads_and_subagent_calls_are_counted PASSED [ 93%]
+tests/test_04_curator.py::test_curator_writes_only_valid_skills_and_never_leaks PASSED [ 96%]
+tests/test_04_curator.py::test_curator_does_nothing_when_nothing_failed PASSED [100%]
+
+============================= 29 passed in 11.08s ==============================

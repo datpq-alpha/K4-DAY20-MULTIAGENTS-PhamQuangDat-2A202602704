@@ -1,0 +1,17 @@
+Curator run 1:
+wrote /lab/skills/auto/prevent-parallel-file-mutations/SKILL.md
+wrote /lab/skills/auto/enforce-type-annotations/SKILL.md
+wrote /lab/skills/auto/maintain-changelog/SKILL.md
+Decision: deleted all three after quality review; see REPORT.md section 6.
+
+Curator run 2:
+wrote /lab/skills/auto/prevent-parallel-file-mutations/SKILL.md
+wrote /lab/skills/auto/enforce-type-annotations/SKILL.md
+wrote /lab/skills/auto/maintain-changelog-and-test-requirements/SKILL.md
+Decision: deleted prevent-parallel-file-mutations; retained the other two without manual edits.
+
+Command: python -m lab.runner --condition skills-auto --tasks learn
+
+skills-auto   code-learn  score=0/10 tokens=179720 calls=0 72.3s ERROR=GraphRecursionError: Recursion limit of 60 reached without hitting a stop condition.
+skills-auto   data-learn  score=1/8 tokens=40513 calls=6 42.8s
+skills-auto   logs-learn  score=0/9 tokens=30768 calls=2 170.3s

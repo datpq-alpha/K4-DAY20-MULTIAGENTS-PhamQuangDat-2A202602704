@@ -1,0 +1,14 @@
+Command: .\.venv\Scripts\python.exe -m pytest tests/test_02_agent.py -k subagents -vv
+
+============================= test session starts =============================
+platform win32 -- Python 3.12.5, pytest-9.1.1, pluggy-1.6.0 -- D:\AI\Day20\.venv\Scripts\python.exe
+rootdir: D:\AI\Day20
+configfile: pyproject.toml
+plugins: anyio-4.15.1, langsmith-0.14.4
+collecting ... collected 9 items / 6 deselected / 3 selected
+
+tests/test_02_agent.py::test_subagents_have_required_fields PASSED       [ 33%]
+tests/test_02_agent.py::test_subagents_mode_adds_subagents_and_delegation_note PASSED [ 66%]
+tests/test_02_agent.py::test_subagents_receive_the_path_convention PASSED [100%]
+
+======================= 3 passed, 6 deselected in 4.30s =======================
