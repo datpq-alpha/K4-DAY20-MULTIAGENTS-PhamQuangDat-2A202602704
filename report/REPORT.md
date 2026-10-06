@@ -7,10 +7,10 @@
 | Họ tên | Mã sinh viên | Phần đóng góp |  
 | Phạm Quang Đạt | 2A202602704 | Cá nhân |  
 
-- Mô hình (tên deployment hoặc `LAB_MODEL`), nhiệt độ (`LAB_TEMPERATURE`), `recursion_limit`:
-- Phiên bản Deep Agents (`pip show deepagents`), hệ điều hành, chạy trực tiếp hay trong Docker:
-- Số lần chạy tác vụ đã dùng / ngân sách:
-- Commit của tag `freeze`:
+- Mô hình: `LAB_MODEL=openai:gpt-4o-mini`; `LAB_TEMPERATURE=0`; `recursion_limit=60`.
+- Deep Agents `0.7.21`; container Linux trên Docker Desktop/WSL2 (`Linux 6.18.33.2-microsoft-standard-WSL2`, Python 3.12).
+- Số lần chạy tác vụ: 28 lượt trong toàn bộ thí nghiệm, gồm 19 lượt ở Phần 4 (12 lượt chính thức ban đầu và 7 lượt retry đúng một lần theo GUIDE); ngoài ra curator gọi mô hình một lần. Không đặt ngân sách cứng.
+- Commit của tag `freeze`: `7428d08a1f285e80ebb6c7c4125f4adea54536db` (`freeze skills`, 2026-10-06T12:55:07+07:00).
 
 ## 2. Giả thuyết (commit TRƯỚC tag `freeze`, Phần 4.0)
 
@@ -115,11 +115,46 @@ Cả ba run ghi cùng `skills_sha256=541e22c2...0ccefe`, trùng với hash tính
 
 ## 7. Kết quả so sánh (Phần 4.3, 4.4)
 
-> Dán nội dung `report/table.md` và kết quả `python scripts/check_breakdown.py`. Nêu các lần chạy có `error` hoặc `skills_modified = true` (nếu có) và cách xử lý.
+| Task | baseline | subagents | skills-auto |
+|---|---|---|---|
+| code-learn | 4/10 | 3/10 | 1/10 |
+| data-learn | 1/8 | 2/8 | 3/8 |
+| logs-learn | 0/9 | 0/9 | 1/9 |
+| code-eval | 1/11 | 1/11 | 4/11 |
+| data-eval | 0/9 | 1/9 | 3/9 |
+| logs-eval | 1/10 | 1/10 | 1/10 |
+| **Mean score - learning tasks** | 0.18 | 0.18 | 0.20 |
+| **Mean score - evaluation tasks** | 0.06 | 0.10 | 0.27 |
+| **Mean tokens per run** | 60,638 | 85,341 | 74,274 |
+| **Runs that read a skill** | 0/6 | 0/6 | 0/6 |
+
+Kết quả `python scripts/check_breakdown.py` sau khi đóng băng:
 
 ```text
-(dán bảng ở đây)
+condition     role    technical  house rules  mean tokens  read a skill
+baseline      eval      2/18         0/12          90,327      0/3
+baseline      learn     5/18         0/9           30,948      0/3
+subagents     eval      3/18         0/12         102,723      0/3
+subagents     learn     5/18         0/9           67,958      0/3
+skills-auto   eval      8/18         0/12          65,101      0/3
+skills-auto   learn     5/18         0/9           83,446      0/3
 ```
+
+`python scripts/verify_freeze.py` trong container trả về `checked 6 runs of skill conditions: OK`. Cả sáu run chính thức của `skills-auto` có cùng `skills_sha256=541e22c2...0ccefe`, bắt đầu sau tag `freeze` và ghi `skills_modified=false`. Không run nào trong ba điều kiện đọc skill (`skills_read=0/6`), vì vậy chênh lệch điểm giữa các điều kiện chưa thể quy trực tiếp cho việc áp dụng nội dung skill.
+
+Bảy run ban đầu gặp `GraphRecursionError` ở giới hạn 60 và đã được retry đúng một lần theo GUIDE. Bản ban đầu được giữ trong `results-first-attempt/`; bảng trên dùng bản retry chính thức trong `results/`:
+
+| Điều kiện / tác vụ | Lần đầu | Retry | Trạng thái retry |
+|---|---:|---:|---|
+| `baseline/code-eval` | 0/11 | 1/11 | Vẫn `GraphRecursionError` |
+| `subagents/code-eval` | 0/11 | 1/11 | Vẫn `GraphRecursionError` |
+| `subagents/data-eval` | 0/9 | 1/9 | Hoàn tất, không lỗi |
+| `skills-auto/code-learn` | 4/10 | 1/10 | Vẫn `GraphRecursionError` |
+| `skills-auto/data-eval` | 0/9 | 3/9 | Hoàn tất, không lỗi |
+| `skills-auto/data-learn` | 0/8 | 3/8 | Hoàn tất, không lỗi |
+| `skills-auto/logs-eval` | 0/10 | 1/10 | Hoàn tất, không lỗi |
+
+Ba retry vẫn lỗi được giữ nguyên, không tăng `recursion_limit` sau khi đóng băng để không thay đổi cấu hình giữa các điều kiện. Các run có lỗi vẫn được runner chấm trên trạng thái workspace tại thời điểm dừng; vì vậy điểm của chúng được báo cáo nhưng phải được xem là kết quả bị kiểm duyệt bởi giới hạn vòng lặp, không tương đương một lần hoàn tất bình thường.
 
 ## 8. Phân tích
 
