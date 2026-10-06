@@ -1,11 +1,10 @@
 # Báo cáo Lab: Self evolving Agentic
 
-> Sao chép tệp này thành `report/REPORT.md` (đã làm ở Phần 0) và điền dần qua các Phần của lab. Xóa các dòng hướng dẫn dạng trích dẫn (bắt đầu bằng `>`). Văn phong kỹ thuật, ngắn gọn, mọi nhận định đi kèm số liệu hoặc bằng chứng. Trong buổi học: điền mục 1 đến 7 (bản nháp). Sau buổi học: hoàn thiện mục 8 đến 10.
-
 ## 1. Thông tin nhóm và cấu hình
 
-| Họ tên | Mã sinh viên | Phần đóng góp |  
-| Phạm Quang Đạt | 2A202602704 | Cá nhân |  
+| Họ tên | Mã sinh viên | Phần đóng góp |
+|---|---|---|
+| Phạm Quang Đạt | 2A202602704 | Cá nhân |
 
 - Mô hình: `LAB_MODEL=openai:gpt-4o-mini`; `LAB_TEMPERATURE=0`; `recursion_limit=60`.
 - Deep Agents `0.7.21`; container Linux trên Docker Desktop/WSL2 (`Linux 6.18.33.2-microsoft-standard-WSL2`, Python 3.12).
@@ -22,29 +21,25 @@
 
 1. Tác tử mặc định có những công cụ nào? Công cụ nào cho phép chạy lệnh?
 
-> Tác tử mặc định có 9 công cụ:
+Tác tử mặc định có 9 công cụ:
 
-> ls, read_file, write_file, edit_file, delete, glob, grep, execute, task
+`ls`, `read_file`, `write_file`, `edit_file`, `delete`, `glob`, `grep`, `execute`, `task`.
 
-> Trong đó, execute là công cụ cho phép chạy lệnh shell. Công cụ này thực thi một shell command trong sandbox và trả về stdout, stderr cùng exit code.
+Trong đó, `execute` là công cụ cho phép chạy lệnh shell. Công cụ này thực thi một shell command trong sandbox và trả về stdout, stderr cùng exit code.
 
 2. Mô tả của công cụ task nói gì về subagent general-purpose? Subagent đó nhìn thấy ngữ cảnh nào của tác tử chính?
 
-> Subagent general-purpose được mô tả là một agent đa dụng, có khả năng nghiên cứu các câu hỏi phức tạp, tìm kiếm file/nội dung và thực hiện các task nhiều bước. Subagent này có quyền truy cập vào tất cả các công cụ giống tác tử chính.
+Subagent general-purpose được mô tả là một agent đa dụng, có khả năng nghiên cứu các câu hỏi phức tạp, tìm kiếm file/nội dung và thực hiện các task nhiều bước. Subagent này có quyền truy cập vào tất cả các công cụ giống tác tử chính.
 
-> Tuy nhiên, mỗi lần gọi general-purpose là stateless theo mặc định: subagent chỉ nhìn thấy prompt được truyền trực tiếp cho nó, không tự động nhìn thấy toàn bộ conversation/context của tác tử chính. Vì vậy cần cung cấp đầy đủ thông tin cần thiết trong prompt.
+Tuy nhiên, mỗi lần gọi general-purpose là stateless theo mặc định: subagent chỉ nhìn thấy prompt được truyền trực tiếp cho nó, không tự động nhìn thấy toàn bộ conversation/context của tác tử chính. Vì vậy cần cung cấp đầy đủ thông tin cần thiết trong prompt.
 
 3. System prompt mặc định của Deep Agents rỗng. Trích một câu hướng dẫn hành vi từ mô tả của task và một câu từ mô tả của execute.
 
->Từ mô tả của task:
-
->>“Launch multiple agents concurrently when their tasks are independent, using a single message with multiple tool calls.”
+Từ mô tả của `task`: “Launch multiple agents concurrently when their tasks are independent, using a single message with multiple tool calls.”
 
 Câu này hướng dẫn tác tử chạy nhiều subagent song song khi các task độc lập.
 
->Từ mô tả của execute:
-
->> “You MUST avoid using search commands like find and grep. Instead use the grep, glob tools to search.”
+Từ mô tả của `execute`: “You MUST avoid using search commands like find and grep. Instead use the grep, glob tools to search.”
 
 Câu này hướng dẫn tác tử không sử dụng các lệnh tìm kiếm find và grep thông qua shell, mà phải sử dụng các tool grep và glob tương ứng.
 
@@ -158,29 +153,57 @@ Ba retry vẫn lỗi được giữ nguyên, không tăng `recursion_limit` sau 
 
 ## 8. Phân tích
 
-> Trả lời từng câu bằng số liệu từ mục 7 và bằng chứng từ vết. Kết quả âm hoặc không có khác biệt vẫn hợp lệ nếu được phân tích tốt.
+1. **Điểm học và điểm đánh giá.** Trên tác vụ học, điểm trung bình chưa làm tròn là `baseline=0,175`, `subagents=0,183` và `skills-auto=0,195`; hai điều kiện sau chỉ tăng lần lượt `0,008` và `0,020` so với baseline. Trên tác vụ đánh giá, các giá trị là `0,064`, `0,101` và `0,266`, nên subagents tăng `0,037` còn skills-auto tăng `0,202`. Không có điều kiện nào tăng trên tập học nhưng giảm trên tập đánh giá. H1 bị bác bỏ vì subagents cao hơn baseline trên eval; H2 bị bác bỏ vì skills-auto cao nhất thay vì thấp hơn baseline; H3 đúng với baseline và subagents nhưng sai với skills-auto, có eval cao hơn learn. Tuy nhiên, ba kết luận này chỉ mô tả tương quan của các run: subagent không được gọi, skill không được đọc và ba run chính thức vẫn bị recursion error.
 
-1. So với `baseline`, điều kiện nào cải thiện điểm tác vụ **học**? Điều kiện nào cải thiện điểm tác vụ **đánh giá**? Có điều kiện nào cải thiện tác vụ học nhưng không cải thiện tác vụ đánh giá? Nếu có, đó là dấu hiệu gì?
-2. Tách điểm thành check kỹ thuật và check quy ước (`rule_`). Skill do curator sinh giúp nhóm check nào? Check quy ước **mới** của tác vụ đánh giá có được skill giúp không, và vì sao?
-3. Dựa vào vết và `skills_read`, giải thích một check mà skill giúp đạt và một check mà skill không giúp (skill chưa được đọc, đọc nhưng không làm theo, skill thiếu hoặc sai).
-4. Chi phí: so sánh số token trung bình giữa các điều kiện. Điều kiện nào có hiệu quả tốt nhất theo điểm trên mỗi token? Đa tác tử có đáng chi phí trong thí nghiệm này không?
-5. Có dấu hiệu rò rỉ dữ liệu hoặc quá khớp nào trong skill sinh ra không? Nhóm đã phòng tránh như thế nào?
-6. Nhiễu: so sánh điểm tác vụ học của cùng bộ skill ở Phần 3.4 (đã sao lưu) và sau đóng băng. Chênh lệch bao nhiêu? Nó cho biết điều gì về độ tin cậy của các chênh lệch trong bảng ở mục 7?
+2. **Check kỹ thuật và quy ước.** Trên tập học, baseline, subagents và skills-auto lần lượt đạt `5/18`, `5/18`, `5/18` check kỹ thuật; trên tập đánh giá là `2/18`, `3/18`, `8/18`. Cả ba điều kiện đều đạt `0/9` check quy ước ở tập học và `0/12` ở tập đánh giá. Do đó phần tăng của skills-auto chỉ xuất hiện ở check kỹ thuật, nhưng không có bằng chứng skill gây ra mức tăng: `skills_read=0` ở cả sáu run. Các quy ước mới của eval không được giúp; ngoài việc skill không được đọc, bộ skill còn thiếu quy ước mới như `rule_version_bump` và không mô tả chính xác schema/quy tắc của nhóm data, logs.
+
+3. **Cơ chế từ vết.** Không có check nào có thể được khẳng định là “được skill giúp đạt”. Chẳng hạn `skills-auto/code-eval` đạt `visible_suite_passes`, `billable_blocks_round_up`, `add_slot_no_shared_state` và `negative_minutes_rejected`; trace cho thấy agent trực tiếp đọc mã, sửa nhiều lần và chạy `pytest`, trong khi không có lần đọc `/skills/.../SKILL.md`, nên đây là hành vi tự thân của agent chứ không phải tác động của skill. Ngược lại, cùng run đó trượt cả `rule_type_hints`, `rule_regression_tests`, `rule_changelog` và `rule_version_bump`; đây là ví dụ trực tiếp rằng hai skill liên quan không giúp khi cơ chế chọn skill không kích hoạt. Tương tự, `data-eval` đạt ba check kỹ thuật sau khi đọc `orders.json`, README và chạy script một lần, nhưng không đọc skill và trượt toàn bộ bốn check `rule_`.
+
+4. **Chi phí.** Token trung bình trên sáu run là baseline `60.638`, subagents `85.341` và skills-auto `74.274`; subagents tốn hơn baseline `40,7%`, skills-auto tốn hơn `22,5%`. Nếu lấy điểm chuẩn hóa trung bình chia token, số điểm trên 100.000 token lần lượt xấp xỉ `0,197`, `0,166`, `0,310`; chỉ riêng eval là `0,070`, `0,098`, `0,408`. Skills-auto có hiệu quả quan sát tốt nhất, nhưng không thể coi đó là lợi ích của skill vì `skills_read=0/6`. Subagents có hiệu quả tổng thể thấp nhất và `subagent_calls=0/6`, nên thí nghiệm này không cung cấp bằng chứng rằng đa tác tử đáng chi phí; chênh lệch chủ yếu là nhiễu giữa các lượt của agent chính.
+
+5. **Rò rỉ và quá khớp.** Không thấy dấu hiệu rò rỉ eval trong hai skill: chúng không chứa id/tên tệp riêng của eval, curator chỉ nhận feedback và phần cuối trace của `baseline/*-learn`, `validate_skill` chặn marker eval, và lịch sử Git chứng minh commit giả thuyết cùng skill đã có trước tag `freeze` và trước các run eval. Hai skill tập trung vào type annotation, regression test và changelog được rút từ feedback learn, nên có nguy cơ quá khớp về phạm vi; chúng không bao phủ quy ước data/log hoặc `rule_version_bump`. Dù vậy, vì không run nào đọc skill, dữ liệu hiện tại chỉ chứng minh khoảng trống bao phủ và kích hoạt, chưa đủ để kết luận quá khớp trong hành vi thực tế.
+
+6. **Nhiễu giữa hai lần chạy cùng bộ skill.** Ở Phần 3.4, `skills-auto` đạt lần lượt `0/10`, `1/8`, `0/9`; sau đóng băng và retry đạt `1/10`, `3/8`, `1/9`. Chênh lệch theo tác vụ là `+0,100`, `+0,250`, `+0,111`, làm điểm học trung bình tăng từ `0,0417` lên `0,1954` (`+0,1537`) dù hash skill giống nhau, `skills_modified=false` và không lần nào ghi nhận đọc skill. Ngay trong hai attempt sau đóng băng, `code-learn` đổi từ `4/10` xuống `1/10`, còn `data-learn` từ `0/8` lên `3/8`. Biên độ này lớn hơn nhiều chênh lệch baseline–subagents, nên các khác biệt nhỏ trong bảng không đáng tin nếu không lặp nhiều seed; cả lợi thế eval của skills-auto cũng chỉ nên xem là kết quả quan sát, không phải ước lượng nhân quả.
 
 ## 9. Hạn chế và tính hợp lệ
 
-> Nêu ít nhất 3 hạn chế và ảnh hưởng của từng hạn chế đến kết luận (ví dụ: chỉ 3 tác vụ mỗi vai trò, mỗi cấu hình chạy một lần, nhiễu của mô hình, tác vụ do giảng viên thiết kế sẵn quy ước, chỉ một mô hình).
-
-1.
-2.
-3.
+1. **Cỡ mẫu nhỏ và tác vụ nhân tạo:** mỗi vai trò chỉ có ba tác vụ thuộc code, data và logs, với quy ước do giảng viên thiết kế. Điểm trung bình vì vậy nhạy với một task và không đại diện chắc chắn cho repository hay quy ước tổ chức ngoài thực tế.
+2. **Ít lần lặp và nhiễu lớn:** mỗi ô chính thức chỉ giữ một run; bảy run phải retry và cùng bộ skill cho chênh lệch điểm học `0,154`. Điều này làm các chênh lệch nhỏ, đặc biệt baseline so với subagents, không đủ độ tin cậy thống kê.
+3. **Kết quả bị kiểm duyệt bởi recursion limit:** ba run chính thức vẫn gặp `GraphRecursionError`; khi bắt exception, runner không còn message để đếm tool/skill call dù workspace vẫn được chấm. Điểm và các bộ đếm bằng 0 của những run này có thể không phản ánh đầy đủ hành vi trước lúc dừng.
+4. **Can thiệp không được kích hoạt:** `subagent_calls=0/6` và `skills_read=0/6`. Vì vậy so sánh hiện tại chủ yếu đo nhiễu giữa các lượt của agent chính dưới prompt/cấu hình khác nhau, không kiểm định trực tiếp hiệu quả của delegation hay nội dung skill.
+5. **Một mô hình và một cấu hình:** toàn bộ thí nghiệm dùng `gpt-4o-mini`, nhiệt độ 0 và giới hạn 60. Kết luận không thể suy rộng sang mô hình mạnh hơn, nhà cung cấp khác hoặc chiến lược giới hạn vòng lặp khác; nhiệt độ 0 cũng không loại bỏ hoàn toàn tính bất định của API/tool calling.
 
 ## 10. Kết luận
 
-> Tối đa 5 câu. Chỉ khẳng định điều số liệu hỗ trợ. Nêu một đề xuất cải tiến tiếp theo.
+Harness, curator và quy trình đóng băng đã hoạt động đúng, với `verify_freeze.py` báo OK cho sáu run skills-auto. Trong lần đo chính thức, skills-auto có điểm eval trung bình cao nhất (`0,266`) so với subagents (`0,101`) và baseline (`0,064`), đồng thời có hiệu quả điểm/token quan sát cao nhất. Tuy nhiên, không run nào đọc skill, không run subagents nào gọi tác tử con và mọi check quy ước đều thất bại, nên không thể quy lợi thế đó cho hai cơ chế đang nghiên cứu. Nhiễu giữa các lần chạy cùng bộ skill (`+0,154` điểm học trung bình) cùng ba recursion error còn lại làm độ chắc chắn của kết luận thấp. Bước tiếp theo nên cải thiện description/routing để bắt buộc đọc skill và tiêu chí giao việc cho subagent, rồi lặp mỗi cấu hình ít nhất ba lần với giới hạn vòng lặp thống nhất được chốt trước khi freeze.
 
 ## Phụ lục
 
-- Lệnh đã chạy (theo thứ tự):
-- Thử thách mở rộng (nếu có): hướng chọn, kết quả, nhận xét.
-- Ghi chú khác:
+- Lệnh chính đã chạy theo thứ tự:
+
+```bash
+pytest tests/test_01_provided.py tests/test_02_agent.py tests/test_03_runner.py
+python -m lab.runner --condition baseline --tasks code-learn logs-learn
+python -m lab.runner --condition subagents --tasks learn
+pytest tests/test_04_curator.py
+python -m lab.curator
+python -m lab.curator
+python -m lab.runner --condition skills-auto --tasks learn
+git commit -m "hypotheses"
+git commit --allow-empty -m "freeze skills"
+git tag freeze
+python -m lab.runner --condition baseline --tasks eval
+python -m lab.runner --condition subagents --tasks eval
+python -m lab.runner --condition skills-auto --tasks all
+python -m lab.runner --condition baseline --tasks code-eval --results results-rerun
+python -m lab.runner --condition subagents --tasks code-eval data-eval --results results-rerun
+python -m lab.runner --condition skills-auto --tasks code-learn data-eval data-learn logs-eval --results results-rerun
+python scripts/verify_freeze.py
+python -m lab.compare
+python scripts/check_breakdown.py
+pytest
+```
+
+- Các lệnh Python được chạy trong container tại `/lab`; các retry dùng cùng model/config và chỉ thay API key khi key cũ bị giới hạn.
+- Thử thách mở rộng: không thực hiện; `results-first-attempt/` chỉ là bản lưu bằng chứng trước retry, không phải Phần 6e vì mỗi lỗi chỉ được retry một lần.
+- Ghi chú: Git trong container được cài tạm để chạy nguyên bản `verify_freeze.py`; việc này không thay đổi source hay image đã commit. `results-docker/` là artifact cục bộ cũ, không thuộc kết quả nộp.

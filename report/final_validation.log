@@ -1,0 +1,32 @@
+Final local validation (no API/model calls)
+Date: 2026-10-06
+
+$ pytest -q
+.............................                                            [100%]
+Result: 29/29 tests passed.
+
+$ python scripts/verify_freeze.py
+checked 6 runs of skill conditions: OK
+
+$ python -m lab.compare
+| Task | baseline | subagents | skills-auto |
+|---|---|---|---|
+| code-learn | 4/10 | 3/10 | 1/10 |
+| data-learn | 1/8 | 2/8 | 3/8 |
+| logs-learn | 0/9 | 0/9 | 1/9 |
+| code-eval | 1/11 | 1/11 | 4/11 |
+| data-eval | 0/9 | 1/9 | 3/9 |
+| logs-eval | 1/10 | 1/10 | 1/10 |
+| **Mean score - learning tasks** | 0.18 | 0.18 | 0.20 |
+| **Mean score - evaluation tasks** | 0.06 | 0.10 | 0.27 |
+| **Mean tokens per run** | 60,638 | 85,341 | 74,274 |
+| **Runs that read a skill** | 0/6 | 0/6 | 0/6 |
+
+$ python scripts/check_breakdown.py
+condition     role    technical  house rules  mean tokens  read a skill
+baseline      eval      2/18         0/12          90,327      0/3
+baseline      learn     5/18         0/9           30,948      0/3
+subagents     eval      3/18         0/12         102,723      0/3
+subagents     learn     5/18         0/9           67,958      0/3
+skills-auto   eval      8/18         0/12          65,101      0/3
+skills-auto   learn     5/18         0/9           83,446      0/3
